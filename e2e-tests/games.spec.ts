@@ -24,6 +24,50 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 
+  test('should filter games by category and publisher', async ({ page }) => {
+    await page.goto('/');
+
+    const categoryFilter = page.getByLabel('Filter by category');
+    const publisherFilter = page.getByLabel('Filter by publisher');
+    const visibleCards = page.locator('[data-testid="game-card"]:not([hidden])');
+    const firstCard = page.getByTestId('game-card').first();
+    const category = await firstCard.getAttribute('data-category');
+    const publisher = await firstCard.getAttribute('data-publisher');
+
+    expect(category).toBeTruthy();
+    expect(publisher).toBeTruthy();
+
+    await test.step('Filter by category', async () => {
+      await categoryFilter.selectOption({ label: category! });
+      await expect(visibleCards).not.toHaveCount(0);
+      await expect(page.getByTestId('filter-results')).toHaveText(/\d+ games? shown/);
+      expect(await visibleCards.evaluateAll((elements, expectedCategory) => elements.every((element) => element.getAttribute('data-category') === expectedCategory), category)).toBeTruthy();
+    });
+
+    await test.step('Combine category and publisher filters', async () => {
+      await publisherFilter.selectOption({ label: publisher! });
+      await expect(visibleCards).not.toHaveCount(0);
+      expect(
+        await visibleCards.evaluateAll(
+          (elements, expected) =>
+            elements.every(
+              (element) =>
+                element.getAttribute('data-category') === expected.category &&
+                element.getAttribute('data-publisher') === expected.publisher,
+            ),
+          { category, publisher },
+        ),
+      ).toBeTruthy();
+    });
+
+    await test.step('Reset both filters', async () => {
+      await categoryFilter.selectOption('');
+      await publisherFilter.selectOption('');
+      await expect(visibleCards).toHaveCount(await page.getByTestId('game-card').count());
+      await expect(page.getByTestId('filtered-empty-state')).toBeHidden();
+    });
+  });
+
   test('should navigate to correct game details page when clicking on a game', async ({ page }) => {
     let gameId: string | null;
     let gameTitle: string | null;
