@@ -20,6 +20,12 @@ Refer to technology-specific instruction files:
 
 ## Core Principles
 
+### Comments and Documentation
+
+- Comment why a component or interaction exists, especially when documenting an accessibility, responsive-layout, or static-rendering decision.
+- Do not add comments that restate visible markup, class names, or straightforward control flow.
+- Keep comments current with the implementation. Treat outdated guidance as a defect and update it with the related change.
+
 ### Testability
 
 - Every interactive element MUST include a `data-testid` attribute
