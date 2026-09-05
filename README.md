@@ -35,6 +35,8 @@ npm run dev
 
 `predev` migrates and seeds the local database first. Then navigate to the [website](http://localhost:4321) to see the site!
 
+The home page includes category and publisher filters. Select either filter, or both together, to narrow the statically rendered game cards; choose the default “All” option to reset a filter.
+
 To preview a production build instead:
 
 ```bash
